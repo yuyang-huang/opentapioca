@@ -46,7 +46,7 @@ class SimpleTagClassifier(object):
                 1,
             ]
             tag_key = mention.tag_key(tag.id)
-            dct[tag_key] = feature_vector
+            dct[tag_key] = [float(x) for x in feature_vector]
         return dct
 
 
