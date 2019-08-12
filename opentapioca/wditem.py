@@ -1,3 +1,5 @@
+import unicodedata
+
 
 class WikidataItemDocument(object):
     def __init__(self, json):
@@ -66,6 +68,17 @@ class WikidataItemDocument(object):
         valid_type_qids = [qid for qid in type_qids if qid]
         return valid_type_qids
 
+    def _is_valid_mention(self, x, min_length_lower=10, min_length_latin=3,
+                          min_length_wide=2, max_length=64):
+        if not x or len(x) > max_length or any(len(c.encode('utf8')) > 3 for c in x):
+            return False
+        alphabets = [c for c in x if c.isalpha()]
+        if all(unicodedata.category(c) == 'Lo' for c in alphabets):
+            return len(alphabets) >= min_length_wide
+        if x.islower():
+            return len(alphabets) >= min_length_lower
+        return len(alphabets) >= min_length_latin
+
     def get_default_label(self, languages):
         labels = self.get('labels', {})
         if isinstance(languages, str):
@@ -73,7 +86,7 @@ class WikidataItemDocument(object):
 
         for language in languages:
             label = labels.get(language, {}).get('value')
-            if label:
+            if self._is_valid_mention(label):
                 return label
         return ''
 
@@ -98,7 +111,7 @@ class WikidataItemDocument(object):
             if language not in languages:
                 continue
             all_labels |= {alias['value'] for alias in aliases}
-        return all_labels
+        return {label for label in all_labels if self._is_valid_mention(label)}
 
     def get_aliases(self, lang):
         aliases = [

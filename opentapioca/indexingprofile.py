@@ -146,6 +146,9 @@ class IndexingProfile(object):
         nb_statements = item.get_nb_statements()
         nb_sitelinks = item.get_nb_sitelinks()
 
+        if len(edges) == 0 or nb_sitelinks == 0:
+            return
+
         return {'id': item.get('id'),
                 'revid': item.get('lastrevid') or 1,
                 'label': default_label,
