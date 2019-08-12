@@ -1,0 +1,19 @@
+{
+        "language": ["ja", "en"],
+        "name": "enwiki",
+        "solrconfig": "tapioca",
+        "restrict_properties": ["P2427", "P1566", "P496"],
+        "restrict_types": [
+            {"type": "Q3778211", "property": "P31"},
+            {"type": "Q43229", "property": "P31"},
+            {"type": "Q618123", "property": "P31"},
+            {"type": "Q1656682", "property": "P31"},
+            {"type": "Q14897293", "property": "P31"},
+            {"type": "Q838948", "property": "P31"},
+            {"type": "Q7725634", "property": "P31"}
+        ],
+        "alias_properties": [
+            {"property": "P496", "prefix": null},
+            {"property": "P4550", "prefix": null}
+        ]
+}

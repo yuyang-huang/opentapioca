@@ -677,6 +677,12 @@
        not be initialized until the first request that uses it.
 
     -->
+  <requestHandler name="/select" class="solr.SearchHandler">
+      <lst name="defaults">
+          <str name="echoParams">explicit</str>
+          <int name="rows">10</int>
+      </lst>
+  </requestHandler>
 
   <requestHandler name="/tag" class="solr.TaggerRequestHandler">
     <lst name="defaults">

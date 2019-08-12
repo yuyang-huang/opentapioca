@@ -1,5 +1,6 @@
 import json
 
+
 class AliasProperty(object):
     """
     Describes how to add an additional alias based on the
@@ -36,6 +37,7 @@ class AliasProperty(object):
             values = [self.prefix + value for value in values]
         return values
 
+
 class TypeConstraint(object):
     """
     Describes a type constraint that an item should satisfy to be indexed.
@@ -54,8 +56,8 @@ class TypeConstraint(object):
         JSON serialization
         """
         return {
-            'type':self.qid,
-            'property':self.pid,
+            'type': self.qid,
+            'property': self.pid,
         }
 
     @classmethod
@@ -71,7 +73,8 @@ class TypeConstraint(object):
         """
         valid_type_qids = item.get_types(self.pid)
         return any(type_matcher.is_subclass(qid, self.qid)
-                          for qid in valid_type_qids)
+                   for qid in valid_type_qids)
+
 
 class IndexingProfile(object):
     """
@@ -109,8 +112,6 @@ class IndexingProfile(object):
         :param type_matcher: a TypeMatcher to check subclass inclusion
         :returns: None if the entity should be skipped
         """
-        valid_type_qids = item.get_types()
-
         type_features = {
             constraint.qid: constraint.satisfied(item, type_matcher)
             for constraint in self.restrict_types or []
@@ -124,14 +125,14 @@ class IndexingProfile(object):
         if not valid_item:
             return
 
-        enlabel = item.get_default_label(self.language)
-        endesc = item.get('descriptions', {}).get(self.language, {}).get('value')
-        if not enlabel:
+        default_label = item.get_default_label(self.language)
+        default_desc = item.get_default_description(self.language)
+        if not default_label:
             return
 
         # Fetch aliases
-        aliases = item.get_all_terms()
-        aliases.remove(enlabel)
+        aliases = item.get_all_terms(self.language)
+        aliases.remove(default_label)
 
         # Edges
         edges = item.get_outgoing_edges(include_p31=False, numeric=True)
@@ -147,15 +148,14 @@ class IndexingProfile(object):
 
         return {'id': item.get('id'),
                 'revid': item.get('lastrevid') or 1,
-               'label': enlabel,
-               'desc': endesc or '',
-               'edges': edges,
-               'types': json.dumps(type_features),
-               'aliases': list(aliases),
-               'extra_aliases': extra_aliases,
-               'nb_statements': nb_statements,
-               'nb_sitelinks': nb_sitelinks}
-
+                'label': default_label,
+                'desc': default_desc,
+                'edges': edges,
+                'types': json.dumps(type_features),
+                'aliases': list(aliases),
+                'extra_aliases': extra_aliases,
+                'nb_statements': nb_statements,
+                'nb_sitelinks': nb_sitelinks}
 
     @classmethod
     def load(cls, filename):
@@ -203,4 +203,3 @@ class IndexingProfile(object):
                 extractor.json() for extractor in self.alias_properties
             ],
         }
-

@@ -83,6 +83,10 @@
 
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
+
+  <lib dir="${solr.install.dir:../../../..}/contrib/analysis-extras/lib" regex="icu4j-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/contrib/analysis-extras/lucene-libs" regex="lucene-analyzers-icu-\d.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-analysis-extras-\d.*\.jar" />
   <!-- an exact 'path' can be used instead of a 'dir' to specify a
        specific jar file.  This will cause a serious error to be logged
        if it can't be loaded.
@@ -677,6 +681,12 @@
        not be initialized until the first request that uses it.
 
     -->
+  <requestHandler name="/select" class="solr.SearchHandler">
+      <lst name="defaults">
+          <str name="echoParams">explicit</str>
+          <int name="rows">10</int>
+      </lst>
+  </requestHandler>
 
   <requestHandler name="/tag" class="solr.TaggerRequestHandler">
     <lst name="defaults">

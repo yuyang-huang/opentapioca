@@ -5,7 +5,7 @@ class WikidataItemDocument(object):
 
     def get(self, field, default_value=None):
         return self.json.get(field, default_value)
-    
+
     def __repr__(self):
         return '<WikidataItemDocument {}>'.format(self.json.get('id') or '(unknown qid)')
 
@@ -63,34 +63,41 @@ class WikidataItemDocument(object):
             claim.get('mainsnak', {}).get('datavalue', {}).get('value', {}).get('id')
             for claim in type_claims
         ]
-        valid_type_qids = [ qid for qid in type_qids if qid ]
+        valid_type_qids = [qid for qid in type_qids if qid]
         return valid_type_qids
 
-    def get_default_label(self, language):
-        """
-        English label if provided, otherwise any other label
-        """
+    def get_default_label(self, languages):
         labels = self.get('labels', {})
-        preferred_label = labels.get(language, {}).get('value')
-        if preferred_label:
-            return preferred_label
-        enlabel = labels.get('en', {}).get('value')
-        if enlabel:
-            return enlabel
-        for other_lang in labels:
-            return labels.get(other_lang, {}).get('value')
-        return None
+        if isinstance(languages, str):
+            languages = [languages]
 
-    def get_all_terms(self):
-        """
-        All labels and aliases in all languages, made unique
-        """
+        for language in languages:
+            label = labels.get(language, {}).get('value')
+            if label:
+                return label
+        return ''
+
+    def get_default_description(self, languages):
+        descriptions = self.get('descriptions', {})
+        if isinstance(languages, str):
+            languages = [languages]
+
+        for language in languages:
+            description = descriptions.get(language, {}).get('value')
+            if description:
+                return description
+        return ''
+
+    def get_all_terms(self, languages):
         all_labels = {
             label['value']
-            for label in self.get('labels', {}).values()
+            for language, label in self.get('labels', {}).items()
+            if language in languages
         }
-        for aliases in self.get('aliases', {}).values():
-            all_labels |= { alias['value'] for alias in aliases }
+        for language, aliases in self.get('aliases', {}).items():
+            if language not in languages:
+                continue
+            all_labels |= {alias['value'] for alias in aliases}
         return all_labels
 
     def get_aliases(self, lang):
@@ -107,7 +114,5 @@ class WikidataItemDocument(object):
             claim.get('mainsnak', {}).get('datavalue', {}).get('value', {})
             for claim in id_claims
         ]
-        valid_ids = [ id for id in ids if id ]
+        valid_ids = [id for id in ids if id]
         return valid_ids
-
-
