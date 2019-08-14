@@ -146,10 +146,6 @@ class SimpleTagClassifier(object):
                 # Retrain on whole dev set with these parameters
                 self.train_model(dataset, None, docid_to_mentions, max_iter=max_iter)
                 best_classifier = self.fit
-                self.save('data/best_classifier_so_far.pkl')
-            else:
-                self.save('data/latest_classifier.pkl')
-
 
         self.fit = best_classifier
         return best_params, best_f1
